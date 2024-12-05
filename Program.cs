@@ -11,6 +11,16 @@ internal class Program
         // connection.Open();
         // //Code...
         // connection.Close();
+        using (var connection = new SqlConnection(connectionString))
+        {
+            UpdateCategory(connection);
+            ListCategories(connection);
+            //CreateCategory(connection);
+        }
+    }
+
+    static void CreateCategory(SqlConnection connection)
+    {
         var category = new Category();
         category.Id = Guid.NewGuid();
         category.Title = "Amazon AWS";
@@ -32,31 +42,43 @@ internal class Program
                 @Description, 
                 @Featured)";
 
-        using (var connection = new SqlConnection(connectionString))
+        //Instead of doing string interpolation, use Sql Parameters to provider values to the query being executed
+        var rows = connection.Execute(insertSql, new
         {
-            //Instead of doing string interpolation, use Sql Parameters to provider values to the query being executed
-            var rows = connection.Execute(insertSql, new
-            {
-                category.Id,
-                category.Title,
-                category.Url,
-                category.Summary,
-                category.Order,
-                category.Description,
-                category.Featured
-            });
+            category.Id,
+            category.Title,
+            category.Url,
+            category.Summary,
+            category.Order,
+            category.Description,
+            category.Featured
+        });
 
-            Console.WriteLine($"{rows} linhas inseridas.");
+        Console.WriteLine($"{rows} linhas inseridas.");
+    }
 
-            var categories = connection.Query<Category>("SELECT [Id], [Title] FROM [Category]");
+    static void ListCategories(SqlConnection connection)
+    {
+        var categories = connection.Query<Category>("SELECT [Id], [Title] FROM [Category]");
 
-            foreach (var item in categories)
-            {
-                Console.WriteLine($"{item.Id} - {item.Title}");
-            }
+        foreach (var item in categories)
+        {
+            Console.WriteLine($"{item.Id} - {item.Title}");
         }
     }
 
+    static void UpdateCategory(SqlConnection connection)
+    {
+        var updateQuery = "UPDATE [Category] SET [Title] = @title WHERE [Id] = @Id";
+
+        var rows = connection.Execute(updateQuery, new
+        {
+            id = new Guid("af3407aa-11ae-4621-a2ef-2028b85507c4"),
+            title = "Frontend 2024"
+        });
+
+        Console.WriteLine($"{rows} registros atualizados.");
+    }
     private static void Module1(SqlConnection connection)
     {
         connection.Open();
