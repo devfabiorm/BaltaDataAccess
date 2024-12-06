@@ -13,9 +13,10 @@ internal class Program
         // connection.Close();
         using (var connection = new SqlConnection(connectionString))
         {
-            UpdateCategory(connection);
-            ListCategories(connection);
+            //UpdateCategory(connection);
+            //ListCategories(connection);
             //CreateCategory(connection);
+            GetCategory(connection);
         }
     }
 
@@ -57,6 +58,76 @@ internal class Program
         Console.WriteLine($"{rows} linhas inseridas.");
     }
 
+    static void CreateManyCategories(SqlConnection connection)
+    {
+        var category = new Category();
+        category.Id = Guid.NewGuid();
+        category.Title = "Amazon AWS";
+        category.Url = "amazon";
+        category.Description = "Categoria destinada a serviços do AWS";
+        category.Order = 8;
+        category.Summary = "AWS Cloud";
+        category.Featured = false;
+
+        var category2 = new Category();
+        category2.Id = Guid.NewGuid();
+        category2.Title = "Categoria Nova";
+        category2.Url = "categoria-nova";
+        category2.Description = "Categoria nova";
+        category2.Order = 9;
+        category2.Summary = "Categoria";
+        category2.Featured = true;
+
+        // Created query using sql parameters
+        var insertSql = @"INSERT INTO
+                [Category]
+            VALUES (
+                @Id,
+                @Title, 
+                @Url, 
+                @Summary, 
+                @Order, 
+                @Description, 
+                @Featured)";
+
+        //Instead of doing string interpolation, use Sql Parameters to provider values to the query being executed
+        var rows = connection.Execute(insertSql, new[]
+        {
+            new {
+                category.Id,
+                category.Title,
+                category.Url,
+                category.Summary,
+                category.Order,
+                category.Description,
+                category.Featured
+            },
+            new {
+                category2.Id,
+                category2.Title,
+                category2.Url,
+                category2.Summary,
+                category2.Order,
+                category2.Description,
+                category2.Featured
+            }
+        });
+
+        Console.WriteLine($"{rows} linhas inseridas.");
+    }
+
+    static void GetCategory(SqlConnection connection)
+    {
+        var category = connection
+            .QueryFirstOrDefault<Category>(
+                "SELECT TOP 1 [Id], [Title] FROM [Category] WHERE Id=@id",
+                new
+                {
+                    id = "239c46e1-3d3e-46a3-bf5a-40c0b579777e"
+                });
+
+        Console.WriteLine($"{category.Id} - {category.Title}");
+    }
     static void ListCategories(SqlConnection connection)
     {
         var categories = connection.Query<Category>("SELECT [Id], [Title] FROM [Category]");
