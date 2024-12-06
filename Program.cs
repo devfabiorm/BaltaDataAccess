@@ -1,4 +1,5 @@
-﻿using BaltaDataAccess.Models;
+﻿using System.Data;
+using BaltaDataAccess.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -13,11 +14,13 @@ internal class Program
         // connection.Close();
         using (var connection = new SqlConnection(connectionString))
         {
-            DeleteCategory(connection);
+            //CreateManyCategories(connection);
+            //DeleteCategory(connection);
             //UpdateCategory(connection);
-            ListCategories(connection);
+            //ListCategories(connection);
             //CreateCategory(connection);
             //GetCategory(connection);
+            ExecuteProcedure(connection);
         }
     }
 
@@ -175,5 +178,17 @@ internal class Program
         });
 
         Console.WriteLine($"{rows} registros excluídos");
+    }
+    static void ExecuteProcedure(SqlConnection connection)
+    {
+        var procedure = "spDeleteStudent";
+        var pars = new { StudentId = "cc9eb342-b44c-4056-bc33-484a15978b48" };
+
+        var affectedRows = connection.Execute(
+            procedure,
+            pars,
+            commandType: CommandType.StoredProcedure);
+
+        Console.WriteLine($"{affectedRows} linhas afetadas");
     }
 }
