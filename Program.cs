@@ -13,10 +13,11 @@ internal class Program
         // connection.Close();
         using (var connection = new SqlConnection(connectionString))
         {
+            DeleteCategory(connection);
             //UpdateCategory(connection);
-            //ListCategories(connection);
+            ListCategories(connection);
             //CreateCategory(connection);
-            GetCategory(connection);
+            //GetCategory(connection);
         }
     }
 
@@ -57,7 +58,6 @@ internal class Program
 
         Console.WriteLine($"{rows} linhas inseridas.");
     }
-
     static void CreateManyCategories(SqlConnection connection)
     {
         var category = new Category();
@@ -115,7 +115,6 @@ internal class Program
 
         Console.WriteLine($"{rows} linhas inseridas.");
     }
-
     static void GetCategory(SqlConnection connection)
     {
         var category = connection
@@ -137,7 +136,6 @@ internal class Program
             Console.WriteLine($"{item.Id} - {item.Title}");
         }
     }
-
     static void UpdateCategory(SqlConnection connection)
     {
         var updateQuery = "UPDATE [Category] SET [Title] = @title WHERE [Id] = @Id";
@@ -167,5 +165,15 @@ internal class Program
                 Console.WriteLine($"{reader.GetGuid(0)} - {reader.GetString(1)}");
             }
         }
+    }
+    static void DeleteCategory(SqlConnection connection)
+    {
+        var deleteQuery = "DELETE FROM [Category] WHERE Id = @id";
+        var rows = connection.Execute(deleteQuery, new
+        {
+            id = "239c46e1-3d3e-46a3-bf5a-40c0b579777e"
+        });
+
+        Console.WriteLine($"{rows} registros excluídos");
     }
 }
