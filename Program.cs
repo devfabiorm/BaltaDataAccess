@@ -21,7 +21,8 @@ internal class Program
             //CreateCategory(connection);
             //GetCategory(connection);
             //ExecuteProcedure(connection);
-            ExecuteReadProcedure(connection);
+            //ExecuteReadProcedure(connection);
+            ExecuteScalar(connection);
         }
     }
 
@@ -207,5 +208,42 @@ internal class Program
         {
             Console.WriteLine(item.Id);
         }
+    }
+
+    static void ExecuteScalar(SqlConnection connection)
+    {
+        var category = new Category();
+        category.Title = "Amazon AWS";
+        category.Url = "amazon";
+        category.Description = "Categoria destinada a serviços do AWS";
+        category.Order = 8;
+        category.Summary = "AWS Cloud";
+        category.Featured = false;
+
+        // Created query using sql parameters
+        var insertSql = @"INSERT INTO
+                [Category]
+            OUTPUT inserted.[Id]
+            VALUES (
+                NEWID(),
+                @Title, 
+                @Url, 
+                @Summary, 
+                @Order, 
+                @Description, 
+                @Featured)";
+
+        //Instead of doing string interpolation, use Sql Parameters to provider values to the query being executed
+        var id = connection.ExecuteScalar<Guid>(insertSql, new
+        {
+            category.Title,
+            category.Url,
+            category.Summary,
+            category.Order,
+            category.Description,
+            category.Featured
+        });
+
+        Console.WriteLine($"A categoria inserida foi: {id}.");
     }
 }
