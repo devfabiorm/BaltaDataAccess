@@ -26,7 +26,8 @@ internal class Program
             //ReadView(connection);
             //OneToOne(connection);
             //OneToMany(connection);
-            QueryMultiple(connection);
+            //QueryMultiple(connection);
+            SelectIn(connection);
         }
     }
 
@@ -330,7 +331,6 @@ internal class Program
             }
         }
     }
-
     static void QueryMultiple(SqlConnection connection)
     {
         var query = "SELECT * FROM [Category]; SELECT * FROM [Course]";
@@ -349,6 +349,28 @@ internal class Program
             {
                 Console.WriteLine(item.Title);
             }
+        }
+    }
+    static void SelectIn(SqlConnection connection)
+    {
+        var query = @"SELECT 
+                        * 
+                    FROM
+                        [Career]
+                    WHERE 
+                        [Id] IN @Id";
+
+        var items = connection.Query<Career>(query, new
+        {
+            id = new[] {
+                "e6730d1c-6870-4df3-ae68-438624e04c72",
+                "92d7e864-bea5-4812-80cc-c2f4e94db1af"
+            }
+        });
+
+        foreach (var item in items)
+        {
+            Console.WriteLine(item.Title);
         }
     }
 }
