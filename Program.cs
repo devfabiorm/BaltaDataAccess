@@ -27,7 +27,8 @@ internal class Program
             //OneToOne(connection);
             //OneToMany(connection);
             //QueryMultiple(connection);
-            SelectIn(connection);
+            //SelectIn(connection);
+            Like(connection);
         }
     }
 
@@ -366,6 +367,26 @@ internal class Program
                 "e6730d1c-6870-4df3-ae68-438624e04c72",
                 "92d7e864-bea5-4812-80cc-c2f4e94db1af"
             }
+        });
+
+        foreach (var item in items)
+        {
+            Console.WriteLine(item.Title);
+        }
+    }
+    static void Like(SqlConnection connection)
+    {
+        var term = "api";
+        var query = @"SELECT 
+                        * 
+                    FROM
+                        [Course]
+                    WHERE 
+                        [Title] LIKE @exp";
+
+        var items = connection.Query<Course>(query, new
+        {
+            exp = $"%{term}%"
         });
 
         foreach (var item in items)
